@@ -1,0 +1,9 @@
+{
+  "filter_paths": "lib|test|script",
+  "exclude_informational": true,
+  "exclude_low": false,
+  "solc_remaps": [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@chainlink/=lib/chainlink-brownie-contracts/contracts/src/v0.8/"
+  ]
+}
