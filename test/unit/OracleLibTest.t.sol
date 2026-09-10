@@ -48,9 +48,7 @@ contract OracleLibTest is Test {
 
     function test_RevertsWhenPriceIsStale() public {
         vm.warp(START_TIME + TIMEOUT + 1);
-        vm.expectRevert(
-            abi.encodeWithSelector(OracleLib.OracleLib__StalePrice.selector, START_TIME, TIMEOUT)
-        );
+        vm.expectRevert(abi.encodeWithSelector(OracleLib.OracleLib__StalePrice.selector, START_TIME, TIMEOUT));
         harness.read(address(feed));
     }
 
@@ -87,9 +85,7 @@ contract OracleLibTest is Test {
     function testFuzz_AnyPriceOlderThanTimeoutReverts(uint256 secondsPassed) public {
         secondsPassed = bound(secondsPassed, TIMEOUT + 1, 365 days);
         vm.warp(START_TIME + secondsPassed);
-        vm.expectRevert(
-            abi.encodeWithSelector(OracleLib.OracleLib__StalePrice.selector, START_TIME, TIMEOUT)
-        );
+        vm.expectRevert(abi.encodeWithSelector(OracleLib.OracleLib__StalePrice.selector, START_TIME, TIMEOUT));
         harness.read(address(feed));
     }
 }

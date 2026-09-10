@@ -29,28 +29,18 @@ contract MockV3Aggregator {
     }
 
     /// @notice Writes a round with full control over the round id and timestamps.
-    function updateRoundData(uint80 _roundId, int256 _answer, uint256 _timestamp, uint256 _startedAt)
-        public
-    {
+    function updateRoundData(uint80 _roundId, int256 _answer, uint256 _timestamp, uint256 _startedAt) public {
         latestRound = _roundId;
         getAnswer[_roundId] = _answer;
         getTimestamp[_roundId] = _timestamp;
         getStartedAt[_roundId] = _startedAt;
     }
 
-    function getRoundData(uint80 _roundId)
-        external
-        view
-        returns (uint80, int256, uint256, uint256, uint80)
-    {
+    function getRoundData(uint80 _roundId) external view returns (uint80, int256, uint256, uint256, uint80) {
         return (_roundId, getAnswer[_roundId], getStartedAt[_roundId], getTimestamp[_roundId], _roundId);
     }
 
-    function latestRoundData()
-        external
-        view
-        returns (uint80, int256, uint256, uint256, uint80)
-    {
+    function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         // casting to 'uint80' is safe because this mock never exceeds a handful of rounds
         // forge-lint: disable-next-line(unsafe-typecast)
         uint80 round = uint80(latestRound);

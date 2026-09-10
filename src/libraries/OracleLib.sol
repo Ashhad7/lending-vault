@@ -22,11 +22,7 @@ library OracleLib {
      * @dev Reverts instead of returning a price that is zero, negative, from an
      *      unfinished round, or older than TIMEOUT.
      */
-    function staleCheckLatestRoundData(AggregatorV3Interface feed)
-        internal
-        view
-        returns (uint256 priceScaledTo18)
-    {
+    function staleCheckLatestRoundData(AggregatorV3Interface feed) internal view returns (uint256 priceScaledTo18) {
         (uint80 roundId, int256 answer,, uint256 updatedAt,) = feed.latestRoundData();
 
         if (roundId == 0 || updatedAt == 0) {
