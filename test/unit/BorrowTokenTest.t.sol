@@ -92,6 +92,8 @@ contract BorrowTokenTest is Test {
         token.mint(alice, 100e18);
 
         vm.prank(alice);
+        // BorrowToken inherits OpenZeppelin ERC20, which reverts on failure
+        // forge-lint: disable-next-line(erc20-unchecked-transfer)
         token.transfer(bob, 30e18);
 
         assertEq(token.balanceOf(alice), 70e18);
