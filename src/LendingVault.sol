@@ -63,9 +63,7 @@ contract LendingVault is ReentrancyGuard {
         i_borrowToken = BorrowToken(borrowToken);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                             BORROWER ACTIONS
-    //////////////////////////////////////////////////////////////*/
+    /*Borrower Actions*/
 
     /// @notice Deposits collateral and mints debt in one transaction.
     function depositAndBorrow(uint256 collateralAmount, uint256 debtAmount) external {
@@ -112,9 +110,7 @@ contract LendingVault is ReentrancyGuard {
         _revertIfHealthFactorBroken(msg.sender);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            LIQUIDATOR ACTION
-    //////////////////////////////////////////////////////////////*/
+    /*Liquidator Actions*/
 
     /**
      * @notice Repays part of an unhealthy user's debt and seizes their collateral
@@ -143,9 +139,7 @@ contract LendingVault is ReentrancyGuard {
         _revertIfHealthFactorBroken(msg.sender);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            INTERNAL PLUMBING
-    //////////////////////////////////////////////////////////////*/
+    /*Internal Plumbing*/
 
     function _withdrawCollateral(uint256 amount, address from, address to) private {
         uint256 balance = s_collateralDeposited[from];
@@ -204,9 +198,7 @@ contract LendingVault is ReentrancyGuard {
         return (usdAmount * PRECISION) / price;
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                 GETTERS
-    //////////////////////////////////////////////////////////////*/
+    //Getters
 
     function getHealthFactor(address user) external view returns (uint256) {
         return _healthFactor(user);

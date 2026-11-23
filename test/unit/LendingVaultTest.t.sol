@@ -2,20 +2,12 @@
 pragma solidity 0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {LendingVault} from "../../src/LendingVault.sol";
 import {BorrowToken} from "../../src/BorrowToken.sol";
 import {OracleLib} from "../../src/libraries/OracleLib.sol";
+import {MockWETH} from "../mocks/MockWETH.sol";
 import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
-
-contract MockWETH is ERC20 {
-    constructor() ERC20("Wrapped Ether", "WETH") {}
-
-    function mint(address to, uint256 amount) external {
-        _mint(to, amount);
-    }
-}
 
 contract LendingVaultTest is Test {
     LendingVault private vault;
@@ -64,9 +56,7 @@ contract LendingVaultTest is Test {
         _;
     }
 
-    /*//////////////////////////////////////////////////////////////
-                              CONSTRUCTOR
-    //////////////////////////////////////////////////////////////*/
+    //Constructor
 
     function test_ConstructorSetsAddresses() public view {
         assertEq(vault.getCollateralToken(), address(weth));
@@ -83,9 +73,7 @@ contract LendingVaultTest is Test {
         assertEq(borrowToken.owner(), address(vault));
     }
 
-    /*//////////////////////////////////////////////////////////////
-                             PRICE CONVERSION
-    //////////////////////////////////////////////////////////////*/
+    //Price and conversion tests
 
     function test_GetUsdValue() public view {
         assertEq(vault.getUsdValue(2e18), 6000e18);
@@ -95,9 +83,7 @@ contract LendingVaultTest is Test {
         assertEq(vault.getTokenAmountFromUsd(6000e18), 2e18);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                DEPOSIT
-    //////////////////////////////////////////////////////////////*/
+    //Deposit tests
 
     function test_DepositMovesTokensAndRecordsBalance() public withDeposit(alice, ONE_ETH) {
         assertEq(vault.getCollateralBalance(alice), ONE_ETH);
@@ -124,9 +110,7 @@ contract LendingVaultTest is Test {
         assertEq(vault.getHealthFactor(alice), type(uint256).max);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                 BORROW
-    //////////////////////////////////////////////////////////////*/
+    //Borrow tests
 
     function test_BorrowMintsTokensAndRecordsDebt() public withPosition(alice, ONE_ETH, SAFE_DEBT) {
         assertEq(borrowToken.balanceOf(alice), SAFE_DEBT);
@@ -174,9 +158,7 @@ contract LendingVaultTest is Test {
         vault.borrow(100e18);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                 REPAY
-    //////////////////////////////////////////////////////////////*/
+    //Repay testss
 
     function test_RepayBurnsTokensAndReducesDebt() public withPosition(alice, ONE_ETH, SAFE_DEBT) {
         vm.prank(alice);
@@ -195,9 +177,7 @@ contract LendingVaultTest is Test {
         vault.repay(SAFE_DEBT + 1);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                WITHDRAW
-    //////////////////////////////////////////////////////////////*/
+    //Withdraw tests
 
     function test_WithdrawWithNoDebtReturnsEverything() public withDeposit(alice, ONE_ETH) {
         vm.prank(alice);
@@ -231,9 +211,7 @@ contract LendingVaultTest is Test {
         assertEq(borrowToken.totalSupply(), 0);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                               LIQUIDATION
-    //////////////////////////////////////////////////////////////*/
+    /*Liquidation tests*/
 
     function test_CannotLiquidateHealthyPosition() public withPosition(alice, ONE_ETH, SAFE_DEBT) {
         vm.prank(bob);
@@ -292,9 +270,7 @@ contract LendingVaultTest is Test {
         vault.liquidate(alice, 500e18);
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                  FUZZ
-    //////////////////////////////////////////////////////////////*/
+    /*Fuzz Tests*/
 
     function testFuzz_DepositThenWithdrawAlwaysReturnsFunds(uint256 amount) public {
         amount = bound(amount, 1, 100e18);
@@ -335,6 +311,8 @@ contract LendingVaultTest is Test {
         vm.stopPrank();
 
         uint256 before = vault.getHealthFactor(alice);
+        // casting to 'int256' is safe because newPrice is bounded to 3000e8
+        // forge-lint: disable-next-line(unsafe-typecast)
         feed.updateAnswer(int256(newPrice));
 
         assertLe(vault.getHealthFactor(alice), before);
