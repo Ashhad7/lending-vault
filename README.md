@@ -13,6 +13,12 @@ Foundry consists of:
 
 https://book.getfoundry.sh/
 
+The invariant suite is split into two campaigns because a single one would have to assert something false. Campaign one holds the price non-decreasing and proves user actions alone cannot create insolvency or push any position below a health factor of 1. Campaign two lets the price move freely, including deliberate crashes, and asserts instead that any insolvency which arises must trace back to a position the protocol has already flagged as liquidatable.
+
+Writing these surfaced three incorrect assumptions before any contract bug: that over-collateralisation could be guaranteed through arbitrary price movement, that a price floor was equivalent to non-decreasing prices, and that a handler's call counts reflect how often a path actually executed. Liquidation is rare under random play, so it is covered primarily by dedicated unit tests rather than by the invariant campaign.
+
+Liquidation always improves a position but does not always restore it above a health factor of 1. Past roughly a 30% drop from the liquidation threshold, a single partial liquidation is insufficient and the position requires repeated rounds.
+
 ## Usage
 
 ### Build
